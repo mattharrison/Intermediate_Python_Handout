@@ -334,7 +334,7 @@ define a generator
 
 
 Generator expressions *PEP 289*
--------------------------------
+===============================
 
 Like list comprehensions.  Except results are generated on the fly.
 Use ``(`` and ``)`` instead of ``[`` and ``]`` (or omit if expecting a
