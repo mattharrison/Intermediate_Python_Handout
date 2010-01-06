@@ -104,8 +104,8 @@ All you need is ``*args`` for normal, named and variable args.
     >>> param_func(6, **{'foo':'bar'})
     [6, 'b', (), {'foo': 'bar'}]
 
-Closures
-========
+Closures *PEP 227*
+==================
 
 Closures are inner functions that have (readonly in 2.6) access to the state they were
 defined in.  (Use ``nonlocal`` keywork in 3.x for write access).
@@ -122,8 +122,8 @@ One common use is for generating functions
     >>> add_2(5)
     7
 
-Decorators
-==========
+Decorators *PEP 318, 3129*
+==========================
 
 Use closures to "wrap" functions in order to execute code before or
 after the function proper executes.
@@ -223,8 +223,8 @@ Class instances as decorators
     >>> @decorator
     ... def nothing(): pass
 
-List Comprehension
-===================
+List Comprehensions *PEP 202*
+=============================
 
     >>> seq = range(10)
     >>> results = [ 2*x for x in seq \
@@ -253,10 +253,10 @@ Same as:
     ...     for y in xrange(4):
     ...         nested.append((x,y))
 
-Iteration Protocol
-==================
+Iteration Protocol *PEP 234*
+=============================
 
-* Get an iterator
+* Get an iterator ( ``__iter__`` )
 * call ``next`` on it
 * ``StopIteration`` error means we're done
 
@@ -285,11 +285,12 @@ Making instances iterable
     ...         # return next item
     ...         return item
 
-Generators
-===========
+Generators *PEP 255, 342*
+=========================
 
-Functions with ``yield`` remember state and return to it when
-iterating over them.  They also follow the iteration protocol
+Functions with ``yield`` are "resumable".  They remember state and
+return to it when iterating over them.  They also follow the iteration
+protocol
 
     >>> def gen_foo_bar():
     ...     yield 'foo'
@@ -332,8 +333,8 @@ define a generator
     ...         yield item
 
 
-Generator expressions
-------------------------
+Generator expressions *PEP 289*
+-------------------------------
 
 Like list comprehensions.  Except results are generated on the fly.
 Use ``(`` and ``)`` instead of ``[`` and ``]`` (or omit if expecting a
