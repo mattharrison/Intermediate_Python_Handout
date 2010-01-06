@@ -72,7 +72,7 @@ Functions are Objects
 
 It's just an object
 
-    >>> adder
+    >>> adder # doctest: +ELLIPSIS,
     <function adder at 0x...>
 
 Now invoke it (with ``(``)
@@ -159,7 +159,7 @@ Define the decorator
     ...     return wrapper
 
 Reassigning ``__doc__`` and ``func_name`` can also be done by
-uncommenting ``@functool.wraps(wrapper)``.  Without this, uses can be
+uncommenting ``@functool.wraps(wrapper)``.  Without this, users can be
 confused by decorated functions (and some tools like ``pickle`` won't work).
 
 Wrap a function
@@ -256,19 +256,27 @@ Same as:
 Iteration Protocol
 ==================
 
+* Get an iterator
+* call ``next`` on it
+* ``StopIteration`` error means we're done
+
     >>> sequence = [ 'foo', 'bar']
-    >>> seq_iter = iter(sequence)  
-    >>> seq_iter.next()
+    >>> seq_iter = iter(sequence) 
+    >>> seq_iter # an iterator # doctest: +ELLIPSIS,
+    <listiterator object at 0x...>
+    >>> seq_iter.next() # iterate over the iterator
     'foo'
     >>> seq_iter.next()
     'bar'
-    >>> seq_iter.next()
+    >>> seq_iter.next() # we're done
     Traceback (most recent call last):
       ...
     StopIteration
 
 Making instances iterable
 --------------------------
+
+
 
     >>> class Iter(object):
     ...     def __iter__(self):
@@ -277,19 +285,29 @@ Making instances iterable
     ...         # return next item
     ...         return item
 
-Making instances iterable(2)
-----------------------------
-
-    >>> class Iter(object):
-    ...     def __iter__(self):
-    ...         yield item
-
 Generators
 ===========
 
 Functions with ``yield`` remember state and return to it when
-iterating over them
+iterating over them.  They also follow the iteration protocol
 
+    >>> def gen_foo_bar():
+    ...     yield 'foo'
+    ...     yield 'bar'
+
+    >>> gen = gen_foo_bar()
+    >>> gen.next()
+    'foo'
+    >>> gen.next()
+    'bar'
+    >>> gen.next()
+    Traceback (most recent call last):
+      ...
+    StopIteration
+
+
+Normal generator example
+------------------------
 
     >>> def gen_range(end):
     ...     cur = 0
@@ -301,16 +319,18 @@ iterating over them
     >>> print [x for x in gen_range(2)]
     [0, 1]
 
-Making instances generate
---------------------------
 
-     >>> class Generate(object):
-     ...     def __iter__(self):
-     ...         # returns a generator
-     ...         return self.next() 
-     ...     def next(self):
-     ...         # logic
-     ...         yield result
+Making instances generate
+----------------------------
+
+Since generators follow the iteration protocol, just have ``__iter__``
+define a generator
+
+    >>> class Iter(object):
+    ...     def __iter__(self):
+    ...         # logic
+    ...         yield item
+
 
 Generator expressions
 ------------------------
