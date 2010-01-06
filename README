@@ -1,0 +1,34 @@
+Intermediate Python Cheatsheet
+==============================
+
+A handout (in the executable handout collection) for an Intermediate
+Python tutorial that I give covering functional programming, closures,
+decorators, generators, list comprehensions and generator expressions.
+
+The content is stored as restructured text in ``handout.rst``.
+
+Using the ``build.sh`` command it will generate an OpenOffice Writer
+document with the handout neatly packaged inside it.  You might want
+to make some tweaks there (or to the template file, ``3coltemp.odt``).
+Then export to pdf or print.
+
+Requires
+========
+
+* docutils
+
+Testing
+=======
+
+This is an "executable handout".  Because it is written using Python
+docstrings, you can actually test it or verify that it is somewhat
+correct.  Run the ``testhandout.py`` to execute the tests.
+
+Feedback
+========
+
+Send questions comments to the author:
+
+  matthewharrison at gmail.com
+
+

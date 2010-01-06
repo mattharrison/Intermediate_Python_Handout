@@ -10,7 +10,7 @@ Intermediate Python
 
 .. class:: small
 
-   ©2009, licensed under a `Creative Commons
+   ©2009-2010, licensed under a `Creative Commons
    Attribution/Share-Alike (BY-SA) license
    <http://creativecommons.org/licenses/by-sa/3.0/>`__.
 
@@ -61,25 +61,72 @@ Notes about "functional" programming in *Python*
   * ``sum`` or ``for`` loop can replace ``reduce``
   * List comprehensions replace ``map`` and ``filter``
 
+Functions
+=========
 
-``*args`` and ``**kw`` 
---------------------------
+Functions are Objects
+----------------------
+
+    >>> def adder(a, b):
+    ...     return a + b
+
+It's just an object
+
+    >>> adder
+    <function adder at 0x...>
+
+Now invoke it (with ``(``)
+
+    >>> adder(2, 5)
+    7
+
+Parameters: normal, named, ``*args`` and ``**kw`` 
+---------------------------------------------------
 
     >>> def param_func(a, b='b', *args, **kw):
     ...     print [x for x in [a, b, args, kw]] 
+
+    >>> args = ('f', 'g')
+
     >>> param_func(2, 'c', 'd', 'e,')
     [2, 'c', ('d', 'e,'), {}]
-    >>> args = ('f', 'g')
     >>> param_func(3, args)
     [3, ('f', 'g'), (), {}]
     >>> param_func(4, *args) # tricksey!
     [4, 'f', ('g',), {}]
+
+All you need is ``*args`` for normal, named and variable args.
+
     >>> param_func(*args) # tricksey!
     ['f', 'g', (), {}]
     >>> param_func(5, 'x', *args)
     [5, 'x', ('f', 'g'), {}]
     >>> param_func(6, **{'foo':'bar'})
     [6, 'b', (), {'foo': 'bar'}]
+
+Closures
+========
+
+Closures are inner functions that have (readonly in 2.6) access to the state they were
+defined in.  (Use ``nonlocal`` keywork in 3.x for write access).
+
+One common use is for generating functions
+
+    >>> def add_x(x):
+    ...     def add(num):
+    ...         # note x isn't defined in add
+    ...         return x + num
+    ...     return add
+
+    >>> add_2 = add_x(2)
+    >>> add_2(5)
+    7
+
+Decorators
+==========
+
+Use closures to "wrap" functions in order to execute code before or
+after the function proper executes.
 
 
 Decorator Template
@@ -94,6 +141,47 @@ Decorator Template
     ...         # do something after
     ...         return result
     ...     return wrapper
+
+
+
+Complete Simple Example
+-----------------------
+
+Define the decorator
+
+    >>> def limit4(function):
+    ...     #@functool.wraps(wrapper)
+    ...     def wrapper(*args, **kw):
+    ...         result = function(*args, **kw)
+    ...         return result[:4]
+    ...     wrapper.__doc__ = function.__doc__
+    ...     wrapper.func_name = function.func_name
+    ...     return wrapper
+
+Reassigning ``__doc__`` and ``func_name`` can also be done by
+uncommenting ``@functool.wraps(wrapper)``.  Without this, uses can be
+confused by decorated functions (and some tools like ``pickle`` won't work).
+
+Wrap a function
+
+    >>> @limit4
+    ... def echo(foo):
+    ...     '''echo contents back'''
+    ...     return foo
+
+``@limit4`` is syntactic sugar for placing ``echo = limit4(echo)``
+after the function definition.
+
+    >>> echo('123456') # should only have 4
+    '1234'
+
+    >>> echo.func_name
+    'echo'
+    >>> help(echo)
+    <BLANKLINE>
+    echo(*args, **kw)
+        echo contents back
+    <BLANKLINE>
 
 
 Parameterized decorators (need 2 closures)
@@ -111,7 +199,10 @@ Parameterized decorators (need 2 closures)
     >>> @limit(5) # notice parens
     ... def echo(foo): return foo
 
-    >>> echo('123456')
+``@limit(5)`` is syntactic sugar for ``echo = limit(5)(echo)``
+    
+
+    >>> echo('123456') # should only have 5
     '12345'
 
 Class instances as decorators
@@ -135,6 +226,7 @@ Class instances as decorators
 List Comprehension
 ===================
 
+    >>> seq = range(10)
     >>> results = [ 2*x for x in seq \
     ...            if x >= 0 ]
 
@@ -143,7 +235,7 @@ Shorthand for accumulation:
     >>> results = []
     >>> for x in seq:
     ...     if x >= 0:
-    ...         results.append(2*x)Can be nested
+    ...         results.append(2*x) #Can be nested
 
 Nested List Comprehensions
 --------------------------
@@ -183,6 +275,14 @@ Making instances iterable
     ...         return self
     ...     def next(self):
     ...         # return next item
+    ...         return item
+
+Making instances iterable(2)
+----------------------------
+
+    >>> class Iter(object):
+    ...     def __iter__(self):
+    ...         yield item
 
 Generators
 ===========
