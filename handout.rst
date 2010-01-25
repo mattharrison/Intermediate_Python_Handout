@@ -125,8 +125,8 @@ One common use is for generating functions
 Decorators *PEP 318, 3129*
 ==========================
 
-Use closures to "wrap" functions in order to execute code before or
-after the function proper executes.
+Use closures to "wrap" a function & return a new function.  Usually to
+execute code before or after the function proper executes.
 
 
 Decorator Template
@@ -154,13 +154,15 @@ Define the decorator
     ...     def wrapper(*args, **kw):
     ...         result = function(*args, **kw)
     ...         return result[:4]
-    ...     wrapper.__doc__ = function.__doc__
-    ...     wrapper.func_name = function.func_name
+    ...     wrapper.__doc__ = function.__doc__  
+    ...     wrapper.__name__ = function.__name__
     ...     return wrapper
 
-Reassigning ``__doc__`` and ``func_name`` can also be done by
-uncommenting ``@functool.wraps(wrapper)``.  Without this, users can be
-confused by decorated functions (and some tools like ``pickle`` won't work).
+Reassigning ``__doc__`` (``func_doc``) and ``__name__``
+(``func_name``) can also be done by uncommenting
+``@functool.wraps(wrapper)``.  Without this, users can be confused by
+decorated functions (and some tools like ``help`` and ``pickle`` won't
+work).
 
 Wrap a function
 
@@ -174,14 +176,6 @@ after the function definition.
 
     >>> echo('123456') # should only have 4
     '1234'
-
-    >>> echo.func_name
-    'echo'
-    >>> help(echo)
-    <BLANKLINE>
-    echo(*args, **kw)
-        echo contents back
-    <BLANKLINE>
 
 
 Parameterized decorators (need 2 closures)
@@ -208,13 +202,14 @@ Parameterized decorators (need 2 closures)
 Class instances as decorators
 -----------------------------
 
+Put decorator into ``__call__`` method
 
     >>> class Decorator(object):
     ...     # in __init__ set up state
     ...     def __call__(self, function):
     ...         def wrapper(*args, **kw):
     ...             # do something before invocation
-    ...             result = self.function(*args, **kw)
+    ...             result = function(*args, **kw)
     ...             # do something after
     ...             return result
     ...         return wrapper
@@ -241,17 +236,22 @@ Nested List Comprehensions
 --------------------------
 
      >>> nested = [ (x, y) for x in xrange(3) \
-     ...           for y in xrange(4) ]
-     >>> nested
-     [(0, 0), (0, 1), (0, 2), (0, 3), (1, 0), (1, 1), (1, 2), (1, 3), (2, 0), (2, 1), (2, 2), (2, 3)]
-
+     ...           for y in xrange(4) if y % 2 == 0]
+     
 Same as:
 
 
     >>> nested = []
     >>> for x in xrange(3):
     ...     for y in xrange(4):
-    ...         nested.append((x,y))
+    ...         if y % 2 == 0:
+    ...             nested.append((x,y))
+
+    >>> nested
+    [(0, 0), (0, 2), (1, 0), (1, 2), (2, 0), (2, 2)]
+
+
+
 
 Iteration Protocol *PEP 234*
 =============================
@@ -282,7 +282,7 @@ Making instances iterable
     ...     def __iter__(self):
     ...         return self
     ...     def next(self):
-    ...         # return next item
+    ...         # logic to calculate next item
     ...         return item
 
 Generators *PEP 255, 342*
